@@ -26,7 +26,10 @@ class Syllabus(Base):
     objectives: Mapped[str | None] = mapped_column(Text, nullable=True)
     content: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # structured content
     status: Mapped[SyllabusStatus] = mapped_column(
-        Enum(SyllabusStatus), default=SyllabusStatus.DRAFT, nullable=False, index=True
+        Enum(SyllabusStatus, values_callable=lambda obj: [e.value for e in obj]),
+        default=SyllabusStatus.DRAFT,
+        nullable=False,
+        index=True,
     )
     university_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
     created_by: Mapped[uuid.UUID] = mapped_column(
