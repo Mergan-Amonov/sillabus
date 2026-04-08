@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, LayoutDashboard, LogOut, Plus, User } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Plus, Settings, User } from "lucide-react";
 import { useAuthStore } from "@/hooks/useAuth";
 import { logout } from "@/lib/auth";
 import Cookies from "js-cookie";
@@ -12,6 +12,7 @@ const navItems = [
   { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
   { href: "/dashboard/syllabuses", label: "Syllabuslar", icon: BookOpen },
   { href: "/dashboard/syllabuses/new", label: "Yangi syllabus", icon: Plus },
+  { href: "/dashboard/settings", label: "Sozlamalar", icon: Settings },
 ];
 
 export function Sidebar() {

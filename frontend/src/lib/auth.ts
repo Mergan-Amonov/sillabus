@@ -31,3 +31,8 @@ export async function fetchCurrentUser(): Promise<User> {
   const { data } = await api.get<User>("/auth/me");
   return data;
 }
+
+export async function updateApiKey(openai_api_key: string | null): Promise<User> {
+  const { data } = await api.patch<User>("/auth/me/api-key", { openai_api_key });
+  return data;
+}

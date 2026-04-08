@@ -6,20 +6,15 @@ from app.core.redis_client import check_rate_limit, get_ai_rate_limit_key
 from app.modules.ai.prompts.v1 import SYSTEM_PROMPT, SYLLABUS_GENERATE_TEMPLATE, PROMPT_VERSION
 from app.modules.ai.schemas import AISyllabusGenerateRequest, AIGenerateResponse
 
-_client: AsyncOpenAI | None = None
-
-
-def _get_client() -> AsyncOpenAI:
-    global _client
-    if _client is None:
-        _client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-    return _client
-
-
 async def generate_syllabus(
     data: AISyllabusGenerateRequest,
     user_id: str,
+    user_api_key: str | None = None,
 ) -> AIGenerateResponse:
+    api_key = user_api_key or settings.OPENAI_API_KEY
+    if not api_key or api_key.startswith("sk-placeholder"):
+        from app.core.exceptions import AppException
+        raise AppException(400, "OpenAI API kaliti kiritilmagan. Sozlamalar sahifasidan kalitingizni kiriting.")
     rate_key = await get_ai_rate_limit_key(user_id)
     allowed = await check_rate_limit(rate_key, settings.AI_RATE_LIMIT_PER_HOUR, window_seconds=3600)
     if not allowed:
@@ -34,7 +29,7 @@ async def generate_syllabus(
         instructions=data.instructions or "None",
     )
 
-    client = _get_client()
+    client = AsyncOpenAI(api_key=api_key)
     response = await client.chat.completions.create(
         model=settings.OPENAI_MODEL,
         messages=[

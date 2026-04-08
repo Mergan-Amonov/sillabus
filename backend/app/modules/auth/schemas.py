@@ -54,6 +54,17 @@ class UserResponse(BaseModel):
     is_active: bool
     university_id: UUID | None
     created_at: datetime
+    has_openai_key: bool = False
+
+    @classmethod
+    def from_user(cls, user: "User") -> "UserResponse":  # type: ignore[override]
+        data = cls.model_validate(user)
+        data.has_openai_key = bool(user.openai_api_key)
+        return data
+
+
+class UpdateApiKeyRequest(BaseModel):
+    openai_api_key: str | None = None
 
 
 class UniversityCreateRequest(BaseModel):

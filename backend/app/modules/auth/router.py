@@ -13,6 +13,7 @@ from app.modules.auth.schemas import (
     UserResponse,
     UniversityCreateRequest,
     UniversityResponse,
+    UpdateApiKeyRequest,
 )
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -52,7 +53,19 @@ async def logout(body: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
 
 @router.get("/me", response_model=UserResponse)
 async def me(current_user: User = Depends(get_current_active_user)):
-    return current_user
+    return UserResponse.from_user(current_user)
+
+
+@router.patch("/me/api-key", response_model=UserResponse)
+async def update_api_key(
+    body: UpdateApiKeyRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    current_user.openai_api_key = body.openai_api_key or None
+    await db.commit()
+    await db.refresh(current_user)
+    return UserResponse.from_user(current_user)
 
 
 # Super admin only

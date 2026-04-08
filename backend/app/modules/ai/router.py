@@ -17,4 +17,4 @@ async def generate(
     Generate syllabus content using GPT-4o.
     Rate limit: 20 requests/hour per user.
     """
-    return await service.generate_syllabus(body, str(current_user.id))
+    return await service.generate_syllabus(body, str(current_user.id), current_user.openai_api_key)

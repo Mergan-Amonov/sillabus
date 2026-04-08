@@ -15,6 +15,7 @@ export interface User {
   is_active: boolean;
   university_id: string | null;
   created_at: string;
+  has_openai_key: boolean;
 }
 
 export interface TokenResponse {
