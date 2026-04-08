@@ -45,5 +45,8 @@ desktop.ini
 *.swp
 *.swo
 
+# Claude Code
+.claude/
+
 # Alembic
 backend/app/migrations/versions/*.pyc
