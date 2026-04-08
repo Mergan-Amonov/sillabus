@@ -55,6 +55,8 @@ class UserResponse(BaseModel):
     university_id: UUID | None
     created_at: datetime
     has_openai_key: bool = False
+    ai_base_url: str | None = None
+    ai_model: str | None = None
 
     @classmethod
     def from_user(cls, user: "User") -> "UserResponse":  # type: ignore[override]
@@ -65,6 +67,8 @@ class UserResponse(BaseModel):
 
 class UpdateApiKeyRequest(BaseModel):
     openai_api_key: str | None = None
+    ai_base_url: str | None = None
+    ai_model: str | None = None
 
 
 class UniversityCreateRequest(BaseModel):

@@ -62,7 +62,10 @@ async def update_api_key(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    current_user.openai_api_key = body.openai_api_key or None
+    if body.openai_api_key is not None:
+        current_user.openai_api_key = body.openai_api_key or None
+    current_user.ai_base_url = body.ai_base_url or None
+    current_user.ai_model = body.ai_model or None
     await db.commit()
     await db.refresh(current_user)
     return UserResponse.from_user(current_user)

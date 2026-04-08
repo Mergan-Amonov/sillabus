@@ -46,6 +46,8 @@ class User(Base):
         UUID(as_uuid=True), ForeignKey("universities.id"), nullable=True
     )
     openai_api_key: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    ai_base_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    ai_model: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

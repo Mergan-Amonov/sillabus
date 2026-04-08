@@ -16,6 +16,8 @@ export interface User {
   university_id: string | null;
   created_at: string;
   has_openai_key: boolean;
+  ai_base_url: string | null;
+  ai_model: string | null;
 }
 
 export interface TokenResponse {

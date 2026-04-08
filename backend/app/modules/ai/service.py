@@ -10,11 +10,15 @@ async def generate_syllabus(
     data: AISyllabusGenerateRequest,
     user_id: str,
     user_api_key: str | None = None,
+    user_base_url: str | None = None,
+    user_model: str | None = None,
 ) -> AIGenerateResponse:
     api_key = user_api_key or settings.OPENAI_API_KEY
     if not api_key or api_key.startswith("sk-placeholder"):
         from app.core.exceptions import AppException
-        raise AppException(400, "OpenAI API kaliti kiritilmagan. Sozlamalar sahifasidan kalitingizni kiriting.")
+        raise AppException(400, "API kalit kiritilmagan. Sozlamalar sahifasidan kalitingizni kiriting.")
+    base_url = user_base_url or None
+    model = user_model or settings.OPENAI_MODEL
     rate_key = await get_ai_rate_limit_key(user_id)
     allowed = await check_rate_limit(rate_key, settings.AI_RATE_LIMIT_PER_HOUR, window_seconds=3600)
     if not allowed:
@@ -29,9 +33,9 @@ async def generate_syllabus(
         instructions=data.instructions or "None",
     )
 
-    client = AsyncOpenAI(api_key=api_key)
+    client = AsyncOpenAI(api_key=api_key, base_url=base_url)
     response = await client.chat.completions.create(
-        model=settings.OPENAI_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
