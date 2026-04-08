@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS base
 
 WORKDIR /app
 
@@ -12,6 +12,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8000
+# ── Development ──────────────────────────────────────────────────────────────
+FROM base AS development
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# ── Production ───────────────────────────────────────────────────────────────
+FROM base AS production
+RUN pip install --no-cache-dir gunicorn
+
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+RUN chmod +x /app/entrypoint.sh
+EXPOSE 8000
+ENTRYPOINT ["/app/entrypoint.sh"]
