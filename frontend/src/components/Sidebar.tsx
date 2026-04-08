@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, LayoutDashboard, LogOut, Plus, Settings, User } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Plus, Settings, User, Users } from "lucide-react";
 import { useAuthStore } from "@/hooks/useAuth";
 import { logout } from "@/lib/auth";
 import Cookies from "js-cookie";
@@ -9,10 +9,11 @@ import Cookies from "js-cookie";
 const REFRESH_KEY = "sb_refresh_token";
 
 const navItems = [
-  { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard },
-  { href: "/dashboard/syllabuses", label: "Syllabuslar", icon: BookOpen },
-  { href: "/dashboard/syllabuses/new", label: "Yangi syllabus", icon: Plus },
-  { href: "/dashboard/settings", label: "Sozlamalar", icon: Settings },
+  { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard, roles: null },
+  { href: "/dashboard/syllabuses", label: "Syllabuslar", icon: BookOpen, roles: null },
+  { href: "/dashboard/syllabuses/new", label: "Yangi syllabus", icon: Plus, roles: null },
+  { href: "/dashboard/users", label: "Foydalanuvchilar", icon: Users, roles: ["super_admin"] },
+  { href: "/dashboard/settings", label: "Sozlamalar", icon: Settings, roles: null },
 ];
 
 export function Sidebar() {
@@ -39,7 +40,8 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {navItems.map(({ href, label, icon: Icon, roles }) => {
+          if (roles && !roles.includes(user?.role ?? "")) return null;
           const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return (
             <Link

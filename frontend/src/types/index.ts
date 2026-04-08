@@ -57,6 +57,11 @@ export interface AIGenerateResponse {
   tokens_used: number;
 }
 
+export interface UserListResponse {
+  items: User[];
+  total: number;
+}
+
 export interface ApiError {
   detail: string;
 }

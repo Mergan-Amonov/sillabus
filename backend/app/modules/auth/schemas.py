@@ -71,6 +71,34 @@ class UpdateApiKeyRequest(BaseModel):
     ai_model: str | None = None
 
 
+class AdminCreateUserRequest(BaseModel):
+    email: EmailStr
+    password: str
+    full_name: str
+    role: UserRole = UserRole.TEACHER
+    university_id: UUID | None = None
+    is_active: bool = True
+
+    @field_validator("password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
+
+
+class AdminUpdateUserRequest(BaseModel):
+    full_name: str | None = None
+    role: UserRole | None = None
+    is_active: bool | None = None
+    university_id: UUID | None = None
+
+
+class UserListResponse(BaseModel):
+    items: list[UserResponse]
+    total: int
+
+
 class UniversityCreateRequest(BaseModel):
     name: str
     slug: str

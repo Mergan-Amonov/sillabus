@@ -110,6 +110,60 @@ async def logout_user(refresh_token_str: str, db: AsyncSession) -> None:
         stored.revoked = True
 
 
+async def admin_create_user(data, db: AsyncSession) -> User:
+    existing = await db.execute(select(User).where(User.email == data.email))
+    if existing.scalar_one_or_none():
+        raise ConflictError("Bu email allaqachon ro'yxatdan o'tgan")
+
+    user = User(
+        email=data.email,
+        hashed_password=hash_password(data.password),
+        full_name=data.full_name,
+        role=data.role,
+        university_id=data.university_id,
+        is_active=data.is_active,
+    )
+    db.add(user)
+    await db.flush()
+    return user
+
+
+async def admin_list_users(db: AsyncSession, page: int = 1, size: int = 20) -> tuple[list[User], int]:
+    from sqlalchemy import func
+    count_result = await db.execute(select(func.count()).select_from(User))
+    total = count_result.scalar_one()
+    result = await db.execute(
+        select(User).order_by(User.created_at.desc()).offset((page - 1) * size).limit(size)
+    )
+    return result.scalars().all(), total
+
+
+async def admin_update_user(user_id: str, data, db: AsyncSession) -> User:
+    from uuid import UUID as _UUID
+    result = await db.execute(select(User).where(User.id == _UUID(user_id)))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise NotFoundError("User")
+    if data.full_name is not None:
+        user.full_name = data.full_name
+    if data.role is not None:
+        user.role = data.role
+    if data.is_active is not None:
+        user.is_active = data.is_active
+    if data.university_id is not None:
+        user.university_id = data.university_id
+    return user
+
+
+async def admin_delete_user(user_id: str, db: AsyncSession) -> None:
+    from uuid import UUID as _UUID
+    result = await db.execute(select(User).where(User.id == _UUID(user_id)))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise NotFoundError("User")
+    await db.delete(user)
+
+
 async def create_university(data: UniversityCreateRequest, db: AsyncSession) -> University:
     existing = await db.execute(select(University).where(University.slug == data.slug))
     if existing.scalar_one_or_none():
