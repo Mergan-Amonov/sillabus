@@ -13,6 +13,34 @@ class SyllabusCreateRequest(BaseModel):
     objectives: str | None = None
     content: dict[str, Any] | None = None
 
+    # Asosiy ma'lumotlar
+    department: str | None = None
+    faculty: str | None = None
+    specialization: str | None = None
+    academic_year: str | None = None
+    semester: int | None = None
+    language: str | None = None
+    prerequisites: str | None = None
+
+    # Soatlar taqsimoti
+    lecture_hours: int | None = None
+    practice_hours: int | None = None
+    lab_hours: int | None = None
+    self_study_hours: int | None = None
+
+    # Baholash
+    grading_policy: dict[str, Any] | None = None
+    attendance_policy: str | None = None
+    passing_grade: int | None = None
+
+    # Resurslar
+    textbooks: list[dict[str, Any]] | None = None
+    online_resources: list[dict[str, Any]] | None = None
+
+    # Kompetensiyalar
+    learning_outcomes: list[str] | None = None
+    competencies: list[str] | None = None
+
     @field_validator("credit_hours")
     @classmethod
     def credit_hours_positive(cls, v: int) -> int:
@@ -30,10 +58,39 @@ class SyllabusCreateRequest(BaseModel):
 
 class SyllabusUpdateRequest(BaseModel):
     title: str | None = None
+    course_code: str | None = None
     credit_hours: int | None = None
     description: str | None = None
     objectives: str | None = None
     content: dict[str, Any] | None = None
+
+    # Asosiy ma'lumotlar
+    department: str | None = None
+    faculty: str | None = None
+    specialization: str | None = None
+    academic_year: str | None = None
+    semester: int | None = None
+    language: str | None = None
+    prerequisites: str | None = None
+
+    # Soatlar taqsimoti
+    lecture_hours: int | None = None
+    practice_hours: int | None = None
+    lab_hours: int | None = None
+    self_study_hours: int | None = None
+
+    # Baholash
+    grading_policy: dict[str, Any] | None = None
+    attendance_policy: str | None = None
+    passing_grade: int | None = None
+
+    # Resurslar
+    textbooks: list[dict[str, Any]] | None = None
+    online_resources: list[dict[str, Any]] | None = None
+
+    # Kompetensiyalar
+    learning_outcomes: list[str] | None = None
+    competencies: list[str] | None = None
 
     @field_validator("credit_hours")
     @classmethod
@@ -73,6 +130,34 @@ class SyllabusResponse(BaseModel):
     reviewed_at: datetime | None
     created_at: datetime
     updated_at: datetime
+
+    # Asosiy ma'lumotlar
+    department: str | None = None
+    faculty: str | None = None
+    specialization: str | None = None
+    academic_year: str | None = None
+    semester: int | None = None
+    language: str | None = None
+    prerequisites: str | None = None
+
+    # Soatlar taqsimoti
+    lecture_hours: int | None = None
+    practice_hours: int | None = None
+    lab_hours: int | None = None
+    self_study_hours: int | None = None
+
+    # Baholash
+    grading_policy: dict[str, Any] | None = None
+    attendance_policy: str | None = None
+    passing_grade: int | None = None
+
+    # Resurslar
+    textbooks: list[dict[str, Any]] | None = None
+    online_resources: list[dict[str, Any]] | None = None
+
+    # Kompetensiyalar
+    learning_outcomes: list[str] | None = None
+    competencies: list[str] | None = None
 
 
 class SyllabusListResponse(BaseModel):

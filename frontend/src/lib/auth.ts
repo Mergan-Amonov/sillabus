@@ -1,10 +1,9 @@
-import { api, setTokens, clearTokens } from "./api";
-import type { User, TokenResponse } from "@/types";
+import { api } from "./api";
+import type { User } from "@/types";
 
 export async function login(email: string, password: string): Promise<User> {
-  const { data } = await api.post<TokenResponse>("/auth/login", { email, password });
-  setTokens(data.access_token, data.refresh_token);
-  return fetchCurrentUser();
+  const { data } = await api.post<User>("/auth/login", { email, password });
+  return data;
 }
 
 export async function register(
@@ -20,11 +19,6 @@ export async function register(
     university_id,
   });
   return data;
-}
-
-export async function logout(refreshToken: string): Promise<void> {
-  await api.post("/auth/logout", { refresh_token: refreshToken });
-  clearTokens();
 }
 
 export async function fetchCurrentUser(): Promise<User> {

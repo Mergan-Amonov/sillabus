@@ -25,6 +25,35 @@ class Syllabus(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     objectives: Mapped[str | None] = mapped_column(Text, nullable=True)
     content: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # structured content
+
+    # Asosiy ma'lumotlar
+    department: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    faculty: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    specialization: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    academic_year: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    semester: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    language: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    prerequisites: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Soatlar taqsimoti
+    lecture_hours: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    practice_hours: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    lab_hours: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    self_study_hours: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    # Baholash
+    grading_policy: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    attendance_policy: Mapped[str | None] = mapped_column(Text, nullable=True)
+    passing_grade: Mapped[int | None] = mapped_column(Integer, nullable=True, default=55)
+
+    # Resurslar
+    textbooks: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    online_resources: Mapped[list | None] = mapped_column(JSON, nullable=True)
+
+    # Kompetensiyalar
+    learning_outcomes: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    competencies: Mapped[list | None] = mapped_column(JSON, nullable=True)
+
     status: Mapped[SyllabusStatus] = mapped_column(
         Enum(SyllabusStatus, values_callable=lambda obj: [e.value for e in obj]),
         default=SyllabusStatus.DRAFT,

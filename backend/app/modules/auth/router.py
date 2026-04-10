@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Request, Response, status, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.deps import get_current_active_user, require_super_admin
 from app.modules.auth import service
@@ -8,8 +10,6 @@ from app.modules.auth.models import User
 from app.modules.auth.schemas import (
     UserRegisterRequest,
     UserLoginRequest,
-    TokenResponse,
-    RefreshTokenRequest,
     UserResponse,
     UniversityCreateRequest,
     UniversityResponse,
@@ -20,6 +20,36 @@ from app.modules.auth.schemas import (
 )
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
+
+_SECURE = settings.APP_ENV == "production"
+_ACCESS_MAX_AGE = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60
+_REFRESH_MAX_AGE = settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600
+
+
+def _set_auth_cookies(response: Response, access_token: str, refresh_token: str) -> None:
+    response.set_cookie(
+        key="sb_access_token",
+        value=access_token,
+        httponly=True,
+        secure=_SECURE,
+        samesite="strict",
+        max_age=_ACCESS_MAX_AGE,
+        path="/",
+    )
+    response.set_cookie(
+        key="sb_refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=_SECURE,
+        samesite="strict",
+        max_age=_REFRESH_MAX_AGE,
+        path="/api/v1/auth/refresh",
+    )
+
+
+def _clear_auth_cookies(response: Response) -> None:
+    response.delete_cookie(key="sb_access_token", path="/")
+    response.delete_cookie(key="sb_refresh_token", path="/api/v1/auth/refresh")
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -32,26 +62,46 @@ async def register(
     return user
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=UserResponse)
 async def login(
     body: UserLoginRequest,
     request: Request,
+    response: Response,
     db: AsyncSession = Depends(get_db),
 ):
-    return await service.login_user(
+    token_data = await service.login_user(
         body.email, body.password, db,
         ip_address=request.client.host if request.client else None,
     )
+    _set_auth_cookies(response, token_data.access_token, token_data.refresh_token)
+    result = await service.get_user_by_email(body.email, db)
+    return UserResponse.from_user(result)
 
 
-@router.post("/refresh", response_model=TokenResponse)
-async def refresh(body: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
-    return await service.refresh_tokens(body.refresh_token, db)
+@router.post("/refresh", response_model=UserResponse)
+async def refresh(
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+    sb_refresh_token: Annotated[str | None, Cookie()] = None,
+):
+    if not sb_refresh_token:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
+    token_data = await service.refresh_tokens(sb_refresh_token, db)
+    _set_auth_cookies(response, token_data.access_token, token_data.refresh_token)
+    user = await service.get_user_by_token(token_data.access_token, db)
+    return UserResponse.from_user(user)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-async def logout(body: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
-    await service.logout_user(body.refresh_token, db)
+async def logout(
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+    sb_refresh_token: Annotated[str | None, Cookie()] = None,
+):
+    if sb_refresh_token:
+        await service.logout_user(sb_refresh_token, db)
+    _clear_auth_cookies(response)
 
 
 @router.get("/me", response_model=UserResponse)
@@ -66,7 +116,8 @@ async def update_api_key(
     current_user: User = Depends(get_current_active_user),
 ):
     if body.openai_api_key is not None:
-        current_user.openai_api_key = body.openai_api_key or None
+        from app.core.encryption import encrypt_value
+        current_user.openai_api_key_encrypted = encrypt_value(body.openai_api_key) if body.openai_api_key else None
     current_user.ai_base_url = body.ai_base_url or None
     current_user.ai_model = body.ai_model or None
     await db.commit()

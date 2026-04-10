@@ -1,12 +1,8 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { BookOpen, LayoutDashboard, LogOut, Plus, Settings, User, Users } from "lucide-react";
 import { useAuthStore } from "@/hooks/useAuth";
-import { logout } from "@/lib/auth";
-import Cookies from "js-cookie";
-
-const REFRESH_KEY = "sb_refresh_token";
 
 const navItems = [
   { href: "/dashboard", label: "Bosh sahifa", icon: LayoutDashboard, roles: null },
@@ -18,19 +14,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, logout: clearUser } = useAuthStore();
-
-  const handleLogout = async () => {
-    const refreshToken = Cookies.get(REFRESH_KEY) ?? "";
-    try {
-      await logout(refreshToken);
-    } catch {
-      // ignore
-    }
-    clearUser();
-    router.replace("/login");
-  };
+  const { user, logout } = useAuthStore();
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed top-0 left-0">
@@ -71,7 +55,7 @@ export function Sidebar() {
           </div>
         </div>
         <button
-          onClick={handleLogout}
+          onClick={logout}
           className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <LogOut size={18} />

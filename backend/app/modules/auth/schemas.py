@@ -61,7 +61,7 @@ class UserResponse(BaseModel):
     @classmethod
     def from_user(cls, user: "User") -> "UserResponse":  # type: ignore[override]
         data = cls.model_validate(user)
-        data.has_openai_key = bool(user.openai_api_key)
+        data.has_openai_key = bool(user.openai_api_key_encrypted)
         return data
 
 

@@ -7,7 +7,7 @@ from uuid import uuid4
 @pytest.mark.asyncio
 async def test_export_requires_auth(client: AsyncClient):
     response = await client.get(f"/api/v1/export/{uuid4()}/pdf")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio

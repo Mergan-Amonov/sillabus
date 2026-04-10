@@ -1,5 +1,32 @@
 import { api } from "./api";
-import type { Syllabus, SyllabusListResponse, AIGenerateResponse } from "@/types";
+import type { Syllabus, SyllabusListResponse, AIGenerateResponse, TextbookEntry, OnlineResourceEntry, GradingPolicy } from "@/types";
+
+export type SyllabusPayload = Partial<{
+  title: string;
+  course_code: string;
+  credit_hours: number;
+  description: string;
+  objectives: string;
+  content: Record<string, unknown>;
+  department: string;
+  faculty: string;
+  specialization: string;
+  academic_year: string;
+  semester: number;
+  language: string;
+  prerequisites: string;
+  lecture_hours: number;
+  practice_hours: number;
+  lab_hours: number;
+  self_study_hours: number;
+  grading_policy: GradingPolicy;
+  attendance_policy: string;
+  passing_grade: number;
+  textbooks: TextbookEntry[];
+  online_resources: OnlineResourceEntry[];
+  learning_outcomes: string[];
+  competencies: string[];
+}>;
 
 export async function listSyllabuses(
   page = 1,
@@ -17,27 +44,17 @@ export async function getSyllabus(id: string): Promise<Syllabus> {
   return data;
 }
 
-export async function createSyllabus(payload: {
-  title: string;
-  course_code: string;
-  credit_hours: number;
-  description?: string;
-  objectives?: string;
-  content?: Record<string, unknown>;
-}): Promise<Syllabus> {
+export async function createSyllabus(
+  payload: Pick<SyllabusPayload, "title" | "course_code" | "credit_hours"> &
+    Omit<SyllabusPayload, "title" | "course_code" | "credit_hours">
+): Promise<Syllabus> {
   const { data } = await api.post<Syllabus>("/syllabuses", payload);
   return data;
 }
 
 export async function updateSyllabus(
   id: string,
-  payload: Partial<{
-    title: string;
-    credit_hours: number;
-    description: string;
-    objectives: string;
-    content: Record<string, unknown>;
-  }>
+  payload: SyllabusPayload
 ): Promise<Syllabus> {
   const { data } = await api.patch<Syllabus>(`/syllabuses/${id}`, payload);
   return data;
@@ -67,6 +84,15 @@ export async function generateAI(payload: {
   credit_hours: number;
   level?: string;
   department?: string;
+  faculty?: string;
+  language?: string;
+  semester?: number;
+  academic_year?: string;
+  lecture_hours?: number;
+  practice_hours?: number;
+  lab_hours?: number;
+  self_study_hours?: number;
+  prerequisites?: string;
   instructions?: string;
 }): Promise<AIGenerateResponse> {
   const { data } = await api.post<AIGenerateResponse>("/ai/generate", payload);

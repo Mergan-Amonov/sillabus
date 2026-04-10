@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "@/types";
 import { fetchCurrentUser } from "@/lib/auth";
-import { clearTokens, getAccessToken } from "@/lib/api";
+import { api } from "@/lib/api";
 
 interface AuthState {
   user: User | null;
@@ -19,22 +19,21 @@ export const useAuthStore = create<AuthState>()(
       hydrated: false,
       setUser: (user) => set({ user }),
       hydrateFromToken: async () => {
-        const token = getAccessToken();
-        if (token) {
-          try {
-            const user = await fetchCurrentUser();
-            set({ user, hydrated: true });
-          } catch {
-            clearTokens();
-            set({ user: null, hydrated: true });
-          }
-        } else {
-          set({ hydrated: true });
+        try {
+          const user = await fetchCurrentUser();
+          set({ user, hydrated: true });
+        } catch {
+          set({ user: null, hydrated: true });
         }
       },
-      logout: () => {
-        clearTokens();
+      logout: async () => {
+        try {
+          await api.post("/auth/logout");
+        } catch {
+          // ignore
+        }
         set({ user: null });
+        window.location.href = "/login";
       },
     }),
     {

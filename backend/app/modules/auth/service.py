@@ -164,6 +164,28 @@ async def admin_delete_user(user_id: str, db: AsyncSession) -> None:
     await db.delete(user)
 
 
+async def get_user_by_email(email: str, db: AsyncSession) -> User:
+    result = await db.execute(select(User).where(User.email == email, User.is_active == True))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise NotFoundError("User")
+    return user
+
+
+async def get_user_by_id(user_id: str, db: AsyncSession) -> User:
+    result = await db.execute(select(User).where(User.id == UUID(user_id), User.is_active == True))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise NotFoundError("User")
+    return user
+
+
+async def get_user_by_token(access_token: str, db: AsyncSession) -> User:
+    from app.core.security import verify_access_token
+    user_id = verify_access_token(access_token)
+    return await get_user_by_id(user_id, db)
+
+
 async def create_university(data: UniversityCreateRequest, db: AsyncSession) -> University:
     existing = await db.execute(select(University).where(University.slug == data.slug))
     if existing.scalar_one_or_none():

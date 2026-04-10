@@ -24,7 +24,7 @@ async def test_create_syllabus(client: AsyncClient, auth_headers: dict):
 @pytest.mark.asyncio
 async def test_create_syllabus_requires_auth(client: AsyncClient):
     response = await client.post("/api/v1/syllabuses", json=SYLLABUS_PAYLOAD)
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio

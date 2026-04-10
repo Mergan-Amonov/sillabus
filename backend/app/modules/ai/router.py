@@ -17,10 +17,15 @@ async def generate(
     Generate syllabus content using GPT-4o.
     Rate limit: 20 requests/hour per user.
     """
+    from app.core.encryption import decrypt_value
+    decrypted_key = None
+    if current_user.openai_api_key_encrypted:
+        decrypted_key = decrypt_value(current_user.openai_api_key_encrypted)
+
     return await service.generate_syllabus(
         body,
         str(current_user.id),
-        current_user.openai_api_key,
+        decrypted_key,
         current_user.ai_base_url,
         current_user.ai_model,
     )

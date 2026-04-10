@@ -40,11 +40,13 @@ class Settings(BaseSettings):
     MINIO_BUCKET_NAME: str = "silabuys"
     MINIO_USE_SSL: bool = False
 
-    # OpenAI
-    OPENAI_API_KEY: str
-    OPENAI_MODEL: str = "gpt-4o"
-    OPENAI_MAX_TOKENS: int = 4096
-    AI_RATE_LIMIT_PER_HOUR: int = 20
+    # AI — default: local Ollama (no key required)
+    # Set OPENAI_API_KEY to use a cloud provider instead
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "llama3.2"
+    OPENAI_BASE_URL: str = "http://host.docker.internal:11434/v1"
+    OPENAI_MAX_TOKENS: int = 8192
+    AI_RATE_LIMIT_PER_HOUR: int = 100
 
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000"
@@ -56,6 +58,9 @@ class Settings(BaseSettings):
 
     def get_allowed_origins(self) -> List[str]:
         return [o.strip() for o in self.ALLOWED_ORIGINS.split(",")]
+
+    # Encryption (Fernet key for sensitive fields)
+    ENCRYPTION_KEY: str = ""
 
     # First super admin (seed)
     FIRST_SUPERADMIN_EMAIL: str = "admin@silabuys.uz"
