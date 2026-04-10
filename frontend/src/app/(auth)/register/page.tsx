@@ -1,17 +1,28 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { register as registerUser } from "@/lib/auth";
+import { api } from "@/lib/api";
+
+interface University {
+  id: string;
+  name: string;
+}
 
 const schema = z.object({
   full_name: z.string().min(2, "Ism kamida 2 ta belgi"),
   email: z.string().email("Noto'g'ri email"),
-  password: z.string().min(6, "Kamida 6 ta belgi"),
+  password: z
+    .string()
+    .min(8, "Parol kamida 8 ta belgi bo'lishi kerak")
+    .regex(/[A-Z]/, "Parolda kamida bitta katta harf bo'lishi kerak")
+    .regex(/[0-9]/, "Parolda kamida bitta raqam bo'lishi kerak"),
   confirm_password: z.string(),
+  university_id: z.string().min(1, "Universitetni tanlang"),
 }).refine((d) => d.password === d.confirm_password, {
   message: "Parollar mos emas",
   path: ["confirm_password"],
@@ -22,6 +33,13 @@ export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [universities, setUniversities] = useState<University[]>([]);
+
+  useEffect(() => {
+    api.get<University[]>("/auth/universities")
+      .then((r) => setUniversities(r.data))
+      .catch(() => {});
+  }, []);
 
   const {
     register,
@@ -32,11 +50,12 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setError("");
     try {
-      await registerUser(data.email, data.password, data.full_name);
+      await registerUser(data.email, data.password, data.full_name, data.university_id);
       setSuccess(true);
       setTimeout(() => router.replace("/login"), 2000);
-    } catch {
-      setError("Ro'yxatdan o'tishda xatolik. Email allaqachon mavjud bo'lishi mumkin.");
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail || "Ro'yxatdan o'tishda xatolik. Email allaqachon mavjud bo'lishi mumkin.");
     }
   };
 
@@ -88,6 +107,24 @@ export default function RegisterPage() {
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Universitet
+              </label>
+              <select
+                {...register("university_id")}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              >
+                <option value="">Universitetni tanlang</option>
+                {universities.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
+              {errors.university_id && (
+                <p className="text-red-500 text-xs mt-1">{errors.university_id.message}</p>
               )}
             </div>
 
