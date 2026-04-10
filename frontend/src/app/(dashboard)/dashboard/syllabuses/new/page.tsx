@@ -80,8 +80,9 @@ export default function NewSyllabusPage() {
         await submitForReview(syllabus.id);
       }
       router.push(`/dashboard/syllabuses/${syllabus.id}`);
-    } catch {
-      setError("Saqlashda xatolik yuz berdi");
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setError(detail || "Saqlashda xatolik yuz berdi");
       setSaving(false);
     }
   };
