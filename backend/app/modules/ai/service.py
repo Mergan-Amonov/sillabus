@@ -93,6 +93,7 @@ async def generate_syllabus(
             ],
             max_tokens=settings.OPENAI_MAX_TOKENS,
             temperature=0.7,
+            response_format={"type": "json_object"},
         )
     except Exception as e:
         err = str(e)
