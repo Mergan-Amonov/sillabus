@@ -26,7 +26,9 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map(({ href, label, icon: Icon, roles }) => {
           if (roles && !roles.includes(user?.role ?? "")) return null;
-          const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+          const isExactMatch = pathname === href;
+          const isParentMatch = href !== "/dashboard" && pathname.startsWith(href + "/");
+          const active = isExactMatch || isParentMatch;
           return (
             <Link
               key={href}
