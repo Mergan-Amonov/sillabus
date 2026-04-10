@@ -1,6 +1,10 @@
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import uuid4
+
+from app.core.security import hash_password
+from app.modules.auth.models import User, UserRole
 
 
 SYLLABUS_PAYLOAD = {
@@ -113,3 +117,29 @@ async def test_syllabus_versions_tracked(client: AsyncClient, auth_headers: dict
     assert response.status_code == 200
     versions = response.json()
     assert len(versions) >= 2
+
+
+@pytest.mark.asyncio
+async def test_create_syllabus_without_university(client: AsyncClient, db_session: AsyncSession):
+    # Regression: ISSUE-001 — 500 error when creating syllabus without university_id
+    # Found by /qa on 2026-04-10
+    # Report: .gstack/qa-reports/qa-report-localhost-2026-04-10.md
+    user = User(
+        email="no_uni@test.com",
+        hashed_password=hash_password("TestPass123"),
+        full_name="No University User",
+        role=UserRole.TEACHER,
+        university_id=None,
+    )
+    db_session.add(user)
+    await db_session.commit()
+
+    await client.post(
+        "/api/v1/auth/login",
+        json={"email": "no_uni@test.com", "password": "TestPass123"},
+    )
+
+    response = await client.post("/api/v1/syllabuses", json=SYLLABUS_PAYLOAD)
+    assert response.status_code in (401, 422)
+    if response.status_code == 422:
+        assert "universitetga" in response.json()["detail"].lower() or "university" in response.json()["detail"].lower()
