@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Loader2, Sparkles, X, Check } from "lucide-react";
 import { generateAI } from "@/lib/syllabuses";
 import type { SyllabusFormData } from "./types";
@@ -24,9 +24,21 @@ interface FieldChoice {
 export function SyllabusFormAI({ formData, onApply, onClose }: Props) {
   const [instructions, setInstructions] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
   const [result, setResult] = useState<AIGenerateResponse | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (generating) {
+      setElapsed(0);
+      timerRef.current = setInterval(() => setElapsed((s) => s + 1), 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [generating]);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -56,7 +68,8 @@ export function SyllabusFormAI({ formData, onApply, onClose }: Props) {
         setSelected(all);
       }
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      const axiosErr = e as { response?: { data?: { detail?: string } }; message?: string };
+      const msg = axiosErr?.response?.data?.detail || axiosErr?.message;
       setError(msg || "AI generatsiyada xatolik yuz berdi");
     } finally {
       setGenerating(false);
@@ -119,6 +132,7 @@ export function SyllabusFormAI({ formData, onApply, onClose }: Props) {
             <>
               <div className="bg-purple-50 rounded-xl p-4 text-sm text-purple-800">
                 AI kurs ma&apos;lumotlari asosida tavsif, o&apos;quv natijalari, baholash tizimi va boshqa bo&apos;limlarni avtomatik to&apos;ldiradi.
+                <span className="block mt-1 text-purple-600 text-xs">Jarayon 1-2 daqiqa olishi mumkin. Sahifani yopmang.</span>
               </div>
 
               <div>
@@ -207,7 +221,10 @@ export function SyllabusFormAI({ formData, onApply, onClose }: Props) {
               {generating ? (
                 <>
                   <Loader2 size={15} className="animate-spin" />
-                  Generatsiya qilinmoqda...
+                  <span>
+                    Generatsiya qilinmoqda
+                    {elapsed > 0 && <span className="opacity-75 ml-1">({elapsed}s)</span>}
+                  </span>
                 </>
               ) : (
                 <>
