@@ -1,5 +1,6 @@
 import pytest
 from httpx import AsyncClient
+from app.modules.auth.models import University
 
 
 @pytest.mark.asyncio
@@ -99,3 +100,46 @@ async def test_refresh_token_reuse_rejected(client: AsyncClient, teacher_user):
     client.cookies.clear()
     response = await client.post("/api/v1/auth/refresh")
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_list_universities_public(client: AsyncClient, test_university: University):
+    # Regression: ISSUE-001 — GET /auth/universities must be public (no auth)
+    # Found by /qa on 2026-04-10
+    # Report: .gstack/qa-reports/qa-report-localhost-2026-04-10.md
+    response = await client.get("/api/v1/auth/universities")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert any(u["id"] == str(test_university.id) for u in data)
+
+
+@pytest.mark.asyncio
+async def test_register_with_university_can_create_syllabus(
+    client: AsyncClient, test_university: University
+):
+    # Regression: ISSUE-002 — users registered without university_id got 422 on syllabus create
+    # Found by /qa on 2026-04-10
+    # The fix: registration form now submits university_id; backend returns 422 clearly
+    reg = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": "new_teacher@test.com",
+            "password": "SecurePass1",
+            "full_name": "New Teacher",
+            "university_id": str(test_university.id),
+        },
+    )
+    assert reg.status_code == 201
+    assert reg.json()["university_id"] == str(test_university.id)
+
+    await client.post(
+        "/api/v1/auth/login",
+        json={"email": "new_teacher@test.com", "password": "SecurePass1"},
+    )
+    response = await client.post(
+        "/api/v1/syllabuses",
+        json={"title": "Test Course", "course_code": "TC101", "credit_hours": 3},
+    )
+    assert response.status_code == 201
+    assert response.json()["status"] == "draft"
