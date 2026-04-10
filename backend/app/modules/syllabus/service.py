@@ -3,7 +3,8 @@ from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
-from app.core.exceptions import NotFoundError, ForbiddenError
+from app.core.exceptions import NotFoundError, ForbiddenError, AppException
+from fastapi import status as http_status
 from app.modules.auth.models import User, UserRole
 from app.modules.syllabus.models import Syllabus, SyllabusStatus, SyllabusVersion
 from app.modules.syllabus.schemas import (
@@ -18,6 +19,11 @@ async def create_syllabus(
     user: User,
     db: AsyncSession,
 ) -> Syllabus:
+    if not user.university_id:
+        raise AppException(
+            status_code=http_status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Foydalanuvchi universitetga biriktirilmagan. Syllabus yaratish uchun universitetga a'zo bo'lish kerak.",
+        )
     syllabus = Syllabus(
         title=data.title,
         course_code=data.course_code,
