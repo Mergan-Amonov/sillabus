@@ -186,6 +186,11 @@ async def get_user_by_token(access_token: str, db: AsyncSession) -> User:
     return await get_user_by_id(user_id, db)
 
 
+async def list_universities(db: AsyncSession) -> list[University]:
+    result = await db.execute(select(University).where(University.is_active == True).order_by(University.name))
+    return result.scalars().all()
+
+
 async def create_university(data: UniversityCreateRequest, db: AsyncSession) -> University:
     existing = await db.execute(select(University).where(University.slug == data.slug))
     if existing.scalar_one_or_none():

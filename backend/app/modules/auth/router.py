@@ -18,6 +18,7 @@ from app.modules.auth.schemas import (
     AdminUpdateUserRequest,
     UserListResponse,
 )
+from typing import List
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -170,6 +171,14 @@ async def delete_user(
 ):
     await service.admin_delete_user(user_id, db)
     await db.commit()
+
+
+@router.get("/universities", response_model=List[UniversityResponse])
+async def list_universities(
+    db: AsyncSession = Depends(get_db),
+):
+    """Public endpoint — returns active universities for registration form."""
+    return await service.list_universities(db)
 
 
 # Super admin only
