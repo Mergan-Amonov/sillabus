@@ -8,7 +8,7 @@ import type { AIGenerateResponse, GradingPolicy, TextbookEntry, OnlineResourceEn
 interface Props {
   formData: Pick<
     SyllabusFormData,
-    "title" | "course_code" | "credit_hours" | "department" | "faculty" | "language" | "semester" | "academic_year" | "lecture_hours" | "practice_hours" | "self_study_hours" | "prerequisites" | "content"
+    "title" | "course_code" | "credit_hours" | "department" | "faculty" | "language" | "semester" | "academic_year" | "lecture_hours" | "practice_hours" | "lab_hours" | "self_study_hours" | "prerequisites" | "content"
   >;
   onApply: (updates: Partial<SyllabusFormData>) => void;
   onClose: () => void;
@@ -57,6 +57,7 @@ export function SyllabusFormAI({ formData, onApply, onClose }: Props) {
         academic_year: formData.academic_year || undefined,
         lecture_hours: formData.lecture_hours ? Number(formData.lecture_hours) : undefined,
         practice_hours: formData.practice_hours ? Number(formData.practice_hours) : undefined,
+        lab_hours: formData.lab_hours ? Number(formData.lab_hours) : undefined,
         self_study_hours: formData.self_study_hours ? Number(formData.self_study_hours) : undefined,
         prerequisites: formData.prerequisites || undefined,
         instructions: instructions || undefined,
