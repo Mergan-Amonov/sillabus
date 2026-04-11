@@ -33,6 +33,29 @@ async def create_syllabus(
         content=data.content,
         university_id=user.university_id,
         created_by=user.id,
+        # Asosiy ma'lumotlar
+        department=data.department,
+        faculty=data.faculty,
+        specialization=data.specialization,
+        academic_year=data.academic_year,
+        semester=data.semester,
+        language=data.language,
+        prerequisites=data.prerequisites,
+        # Soatlar taqsimoti
+        lecture_hours=data.lecture_hours,
+        practice_hours=data.practice_hours,
+        lab_hours=data.lab_hours,
+        self_study_hours=data.self_study_hours,
+        # Baholash
+        grading_policy=data.grading_policy,
+        attendance_policy=data.attendance_policy,
+        passing_grade=data.passing_grade,
+        # Resurslar va kompetensiyalar
+        textbooks=data.textbooks,
+        online_resources=data.online_resources,
+        learning_outcomes=data.learning_outcomes,
+        competencies=data.competencies,
+        # TIU meta
         instructor_phone=data.instructor_phone,
         office_hours=data.office_hours,
         reviewer_1=data.reviewer_1.model_dump() if data.reviewer_1 else None,
