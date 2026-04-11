@@ -72,6 +72,7 @@ export default function SyllabusDetailPage() {
   };
 
   const handleExport = async (format: "pdf" | "docx") => {
+    if (!syllabus) return;
     setActionLoading(true);
     try {
       const response = await api.get(`/export/${id}/${format}`, { responseType: "blob" });
