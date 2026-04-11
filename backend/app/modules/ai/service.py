@@ -58,7 +58,7 @@ async def generate_syllabus(
     model = user_model or settings.OPENAI_MODEL
 
     lecture_h, practice_h, self_study_h = _compute_hours(data)
-    total_weeks = 16  # one semester = 16 weeks regardless of credit hours
+    total_weeks = 15  # one semester = 15 weeks (matches SyllabusFormWeekly WEEK_COUNT)
     language_instruction = LANGUAGE_INSTRUCTIONS.get(data.language, LANGUAGE_INSTRUCTIONS["uzbek"])
 
     user_prompt = SYLLABUS_GENERATE_TEMPLATE.format(
@@ -72,10 +72,10 @@ async def generate_syllabus(
         language=data.language,
         semester=data.semester or "Not specified",
         academic_year=data.academic_year or "Not specified",
-        lecture_hours=data.lecture_hours or "Not specified",
-        practice_hours=data.practice_hours or "Not specified",
-        lab_hours=data.lab_hours or "Not specified",
-        self_study_hours=data.self_study_hours or "Not specified",
+        lecture_hours=data.lecture_hours if data.lecture_hours is not None else "Not specified",
+        practice_hours=data.practice_hours if data.practice_hours is not None else "Not specified",
+        lab_hours=data.lab_hours if data.lab_hours is not None else "Not specified",
+        self_study_hours=data.self_study_hours if data.self_study_hours is not None else "Not specified",
         prerequisites=data.prerequisites or "None",
         instructions=(data.instructions or "") + (" " + data.additional_requirements if data.additional_requirements else ""),
         total_weeks=total_weeks,
@@ -84,8 +84,8 @@ async def generate_syllabus(
         default_self_study_h=self_study_h,
     )
 
-    try:
-        response = await client.chat.completions.create(
+    async def _call_api(use_response_format: bool) -> object:
+        kwargs = dict(
             model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -93,8 +93,13 @@ async def generate_syllabus(
             ],
             max_tokens=settings.OPENAI_MAX_TOKENS,
             temperature=0.7,
-            response_format={"type": "json_object"},
         )
+        if use_response_format:
+            kwargs["response_format"] = {"type": "json_object"}
+        return await client.chat.completions.create(**kwargs)
+
+    try:
+        response = await _call_api(use_response_format=True)
     except Exception as e:
         err = str(e)
         if "429" in err or "rate" in err.lower() or "quota" in err.lower():
@@ -109,7 +114,20 @@ async def generate_syllabus(
         if "connect" in err.lower() or "connection" in err.lower():
             from app.core.exceptions import AppException
             raise AppException(503, "AI serverga ulanib bo'lmadi. Ollama ishlab turganini tekshiring.")
-        raise
+        # Some models (OpenRouter, Gemini, old Ollama) don't support response_format.
+        # Retry without it — system prompt already says "Output ONLY valid JSON".
+        if "response_format" in err.lower() or "unsupported" in err.lower() or ("400" in err and "format" in err.lower()):
+            try:
+                response = await _call_api(use_response_format=False)
+            except Exception as e2:
+                err2 = str(e2)
+                if "401" in err2 or "403" in err2:
+                    from app.core.exceptions import AppException
+                    raise AppException(401, "API kalit noto'g'ri. Sozlamalardan kalitni tekshiring.")
+                from app.core.exceptions import AppException
+                raise AppException(502, f"AI generatsiya muvaffaqiyatsiz: {err2[:200]}")
+        else:
+            raise
 
     content = response.choices[0].message.content or ""
 

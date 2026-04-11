@@ -6,8 +6,9 @@ import {
   ArrowLeft, Download, Edit2, Send, Trash2, X, CheckCircle, XCircle,
 } from "lucide-react";
 import {
-  getSyllabus, submitForReview, reviewSyllabus, deleteSyllabus, exportUrl,
+  getSyllabus, submitForReview, reviewSyllabus, deleteSyllabus,
 } from "@/lib/syllabuses";
+import { api } from "@/lib/api";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useAuthStore } from "@/hooks/useAuth";
 import type { Syllabus, SyllabusStatus, WeekEntry } from "@/types";
@@ -70,6 +71,31 @@ export default function SyllabusDetailPage() {
     }
   };
 
+  const handleExport = async (format: "pdf" | "docx") => {
+    setActionLoading(true);
+    try {
+      const response = await api.get(`/export/${id}/${format}`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      const ext = format === "pdf" ? "pdf" : "docx";
+      link.setAttribute("download", `${syllabus.course_code}_${syllabus.title.slice(0, 30).replace(/\s+/g, "_")}.${ext}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number; data?: unknown } };
+      if (axiosErr?.response?.status === 403) {
+        setError("Eksport uchun ruxsat yo'q. Faqat tasdiqlangan yoki ko'rib chiqilayotgan syllabuslar eksport qilinishi mumkin.");
+      } else {
+        setError("Eksport qilishda xatolik yuz berdi");
+      }
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
     setActionLoading(true);
@@ -85,7 +111,7 @@ export default function SyllabusDetailPage() {
   if (loading) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
       </div>
     );
   }
@@ -94,10 +120,14 @@ export default function SyllabusDetailPage() {
 
   const isOwner = syllabus.created_by === user?.id;
   const canReview = user?.role === "reviewer" || user?.role === "university_admin" || user?.role === "super_admin";
-  const canSubmit = isOwner && syllabus.status === "draft";
+  const canSubmit = isOwner && (syllabus.status === "draft" || syllabus.status === "rejected");
   const canReviewAction = canReview && syllabus.status === "pending_review";
   const canDelete = isOwner && (syllabus.status === "draft" || syllabus.status === "rejected");
   const canEdit = isOwner && (syllabus.status === "draft" || syllabus.status === "rejected");
+  const canExport =
+    syllabus.status === "approved" ||
+    syllabus.status === "pending_review" ||
+    (isOwner && user?.role === "teacher");
 
   return (
     <div className="max-w-4xl pb-12">
@@ -144,7 +174,7 @@ export default function SyllabusDetailPage() {
         )}
         {canSubmit && (
           <button onClick={handleSubmit} disabled={actionLoading}
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">
+            className="inline-flex items-center gap-2 bg-primary-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors">
             <Send size={14} /> Ko&apos;rib chiqishga yuborish
           </button>
         )}
@@ -154,14 +184,26 @@ export default function SyllabusDetailPage() {
             Ko&apos;rib chiqish
           </button>
         )}
-        <a href={exportUrl(id, "pdf")} target="_blank" rel="noreferrer"
-          className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-          <Download size={14} /> PDF
-        </a>
-        <a href={exportUrl(id, "docx")} target="_blank" rel="noreferrer"
-          className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-          <Download size={14} /> DOCX
-        </a>
+        {canExport && (
+          <>
+            <button
+              type="button"
+              onClick={() => handleExport("pdf")}
+              disabled={actionLoading}
+              className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <Download size={14} /> PDF
+            </button>
+            <button
+              type="button"
+              onClick={() => handleExport("docx")}
+              disabled={actionLoading}
+              className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              <Download size={14} /> DOCX
+            </button>
+          </>
+        )}
         {canDelete && (
           <button onClick={handleDelete} disabled={actionLoading}
             className="inline-flex items-center gap-2 px-3 py-2 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors">
@@ -176,7 +218,7 @@ export default function SyllabusDetailPage() {
           <h2 className="text-base font-semibold mb-3">Ko&apos;rib chiqish</h2>
           <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)}
             placeholder="Izoh (ixtiyoriy)..." rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-4" />
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none mb-4" />
           <div className="flex gap-3">
             <button onClick={() => handleReview("approve")} disabled={actionLoading}
               className="flex-1 inline-flex items-center justify-center gap-2 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors">
@@ -203,7 +245,7 @@ export default function SyllabusDetailPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                 activeTab === tab.key
-                  ? "border-blue-600 text-blue-600"
+                  ? "border-primary-600 text-primary-600"
                   : "border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300"
               }`}
             >
@@ -316,7 +358,7 @@ function TabJadval({ syllabus }: { syllabus: Syllabus }) {
         Haftalik jadval mavjud emas.
         {syllabus.status === "draft" && (
           <Link href={`/dashboard/syllabuses/${syllabus.id}/edit`}
-            className="block mt-2 text-blue-600 hover:underline font-medium">
+            className="block mt-2 text-primary-600 hover:underline font-medium">
             Tahrirlashda AI orqali to&apos;ldirish
           </Link>
         )}
@@ -328,7 +370,7 @@ function TabJadval({ syllabus }: { syllabus: Syllabus }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-blue-600 text-white">
+          <tr className="bg-primary-600 text-white">
             {["#", "Mavzu", "Ma'ruza", "Amaliy", "Mustaqil ish"].map((h) => (
               <th key={h} className="px-4 py-3 text-left font-semibold text-xs uppercase tracking-wide first:w-10">{h}</th>
             ))}
@@ -361,7 +403,7 @@ const GRADING_LABELS: Record<string, string> = {
   final: "Yakuniy imtihon",
 };
 
-const GRADING_COLORS = ["bg-blue-500", "bg-purple-500", "bg-indigo-600"];
+const GRADING_COLORS = ["bg-primary-500", "bg-purple-500", "bg-indigo-600"];
 
 function TabBaholash({ syllabus }: { syllabus: Syllabus }) {
   const gp = syllabus.grading_policy;
@@ -403,9 +445,9 @@ function TabBaholash({ syllabus }: { syllabus: Syllabus }) {
 
       {/* Passing grade + attendance */}
       {syllabus.passing_grade !== null && (
-        <div className="bg-blue-50 rounded-xl px-4 py-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <span className="text-sm font-bold text-blue-700">{syllabus.passing_grade}</span>
+        <div className="bg-primary-50 rounded-xl px-4 py-3 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+            <span className="text-sm font-bold text-primary-700">{syllabus.passing_grade}</span>
           </div>
           <div>
             <p className="text-sm font-medium text-gray-800">O&apos;tish bali</p>
@@ -482,12 +524,12 @@ function TabAdabiyotlar({ syllabus }: { syllabus: Syllabus }) {
           <ul className="space-y-3 mt-2">
             {resources.map((r, i) => (
               <li key={i} className="flex gap-2.5">
-                <span className="text-blue-400 shrink-0 mt-0.5">•</span>
+                <span className="text-primary-500 shrink-0 mt-0.5">•</span>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{r.name}</p>
                   {r.url && (
                     <a href={r.url} target="_blank" rel="noreferrer"
-                      className="text-xs text-blue-600 hover:underline break-all">
+                      className="text-xs text-primary-600 hover:underline break-all">
                       {r.url}
                     </a>
                   )}
@@ -522,7 +564,7 @@ function TabNatijalar({ syllabus }: { syllabus: Syllabus }) {
           <ul className="mt-2 space-y-2">
             {outcomes.map((o, i) => (
               <li key={i} className="flex gap-2.5 text-sm">
-                <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0">
+                <span className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-xs font-bold flex items-center justify-center shrink-0">
                   {i + 1}
                 </span>
                 <span className="text-gray-700 pt-0.5">{o}</span>
@@ -566,7 +608,7 @@ function HourBar({ label, hours, total }: { label: string; hours: number; total:
       <span className="text-sm text-gray-500 w-28 shrink-0">{label}</span>
       <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all ${hours > 0 ? "bg-blue-500" : "bg-gray-200"}`}
+          className={`h-full rounded-full transition-all ${hours > 0 ? "bg-primary-500" : "bg-gray-200"}`}
           style={{ width: `${pct}%` }}
         />
       </div>

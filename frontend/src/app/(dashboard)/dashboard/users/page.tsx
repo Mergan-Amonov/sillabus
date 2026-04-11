@@ -14,7 +14,7 @@ const ROLES: { value: UserRole; label: string }[] = [
 
 const ROLE_BADGE: Record<UserRole, string> = {
   super_admin: "bg-purple-100 text-purple-800",
-  university_admin: "bg-blue-100 text-blue-800",
+  university_admin: "bg-primary-100 text-primary-700",
   reviewer: "bg-yellow-100 text-yellow-800",
   teacher: "bg-green-100 text-green-800",
 };
@@ -108,7 +108,7 @@ export default function UsersPage() {
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
           <Plus size={16} />
           Yangi foydalanuvchi
@@ -118,7 +118,7 @@ export default function UsersPage() {
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
           </div>
         ) : (
           <table className="w-full">
@@ -159,7 +159,7 @@ export default function UsersPage() {
                     <div className="flex items-center gap-2 justify-end">
                       <button
                         onClick={() => openEdit(u)}
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                       >
                         <Pencil size={15} />
                       </button>
@@ -214,7 +214,7 @@ export default function UsersPage() {
                   value={form.full_name}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   placeholder="Ahmadov Jasur"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
 
@@ -227,7 +227,7 @@ export default function UsersPage() {
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
                       placeholder="jasur@university.uz"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
                   <div>
@@ -237,7 +237,7 @@ export default function UsersPage() {
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
                       placeholder="Kamida 8 ta belgi"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
                 </>
@@ -248,7 +248,7 @@ export default function UsersPage() {
                 <select
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value as UserRole })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                 >
                   {ROLES.map((r) => (
                     <option key={r.value} value={r.value}>{r.label}</option>
@@ -260,7 +260,7 @@ export default function UsersPage() {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, is_active: !form.is_active })}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${form.is_active ? "bg-blue-600" : "bg-gray-300"}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${form.is_active ? "bg-primary-600" : "bg-gray-300"}`}
                 >
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.is_active ? "translate-x-5" : ""}`} />
                 </button>
@@ -275,7 +275,7 @@ export default function UsersPage() {
                   Bekor
                 </button>
                 <button onClick={handleSave} disabled={saving}
-                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                  className="flex-1 bg-primary-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors">
                   {saving ? "Saqlanmoqda..." : editUser ? "Saqlash" : "Yaratish"}
                 </button>
               </div>

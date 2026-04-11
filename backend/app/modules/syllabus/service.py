@@ -33,6 +33,11 @@ async def create_syllabus(
         content=data.content,
         university_id=user.university_id,
         created_by=user.id,
+        instructor_phone=data.instructor_phone,
+        office_hours=data.office_hours,
+        reviewer_1=data.reviewer_1.model_dump() if data.reviewer_1 else None,
+        reviewer_2=data.reviewer_2.model_dump() if data.reviewer_2 else None,
+        approval_info=data.approval_info.model_dump() if data.approval_info else None,
     )
     db.add(syllabus)
     await db.flush()
@@ -101,8 +106,8 @@ async def submit_for_review(syllabus_id: UUID, user: User, db: AsyncSession) -> 
 
     if syllabus.created_by != user.id:
         raise ForbiddenError("Only the creator can submit for review")
-    if syllabus.status != SyllabusStatus.DRAFT:
-        raise ForbiddenError("Only draft syllabuses can be submitted for review")
+    if syllabus.status not in (SyllabusStatus.DRAFT, SyllabusStatus.REJECTED):
+        raise ForbiddenError("Only draft or rejected syllabuses can be submitted for review")
 
     syllabus.status = SyllabusStatus.PENDING_REVIEW
     syllabus.updated_at = datetime.now(timezone.utc)
@@ -179,6 +184,11 @@ async def _create_version(syllabus: Syllabus, user_id: UUID, db: AsyncSession) -
         "objectives": syllabus.objectives,
         "content": syllabus.content,
         "status": syllabus.status,
+        "instructor_phone": syllabus.instructor_phone,
+        "office_hours": syllabus.office_hours,
+        "reviewer_1": syllabus.reviewer_1,
+        "reviewer_2": syllabus.reviewer_2,
+        "approval_info": syllabus.approval_info,
     }
     db.add(SyllabusVersion(
         syllabus_id=syllabus.id,

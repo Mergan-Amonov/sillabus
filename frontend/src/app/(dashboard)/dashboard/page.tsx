@@ -30,7 +30,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <StatCard label="Jami syllabuslar" value={counts.total} icon={<BookOpen size={20} />} color="blue" />
+        <StatCard label="Jami syllabuslar" value={counts.total} icon={<BookOpen size={20} />} color="teal" />
         <StatCard label="Tasdiqlangan" value={counts.approved} icon={<CheckCircle size={20} />} color="green" />
         <StatCard label="Ko'rib chiqilmoqda" value={counts.pending} icon={<Clock size={20} />} color="yellow" />
         <StatCard label="Rad etilgan" value={counts.rejected} icon={<XCircle size={20} />} color="red" />
@@ -39,14 +39,14 @@ export default function DashboardPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-gray-900">So&apos;nggi syllabuslar</h2>
-          <Link href="/dashboard/syllabuses" className="text-sm text-blue-600 hover:underline">
+          <Link href="/dashboard/syllabuses" className="text-sm text-primary-600 hover:underline">
             Hammasini ko&apos;rish
           </Link>
         </div>
 
         {loading ? (
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
           </div>
         ) : data?.items.length === 0 ? (
           <div className="text-center py-8">
@@ -54,7 +54,7 @@ export default function DashboardPage() {
             <p className="text-gray-500 text-sm">Hali syllabus yo&apos;q</p>
             <Link
               href="/dashboard/syllabuses/new"
-              className="inline-block mt-3 text-sm text-blue-600 hover:underline"
+              className="inline-block mt-3 text-sm text-primary-600 hover:underline"
             >
               Yangi syllabus yarating
             </Link>
@@ -90,10 +90,10 @@ function StatCard({
   label: string;
   value: number;
   icon: React.ReactNode;
-  color: "blue" | "green" | "yellow" | "red";
+  color: "teal" | "green" | "yellow" | "red";
 }) {
   const colors = {
-    blue: "bg-blue-50 text-blue-600",
+    teal: "bg-primary-50 text-primary-600",
     green: "bg-green-50 text-green-600",
     yellow: "bg-yellow-50 text-yellow-600",
     red: "bg-red-50 text-red-600",

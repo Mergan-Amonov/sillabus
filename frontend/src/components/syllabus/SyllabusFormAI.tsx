@@ -8,7 +8,7 @@ import type { AIGenerateResponse, GradingPolicy, TextbookEntry, OnlineResourceEn
 interface Props {
   formData: Pick<
     SyllabusFormData,
-    "title" | "course_code" | "credit_hours" | "department" | "faculty" | "language" | "semester" | "academic_year" | "lecture_hours" | "practice_hours" | "self_study_hours" | "prerequisites"
+    "title" | "course_code" | "credit_hours" | "department" | "faculty" | "language" | "semester" | "academic_year" | "lecture_hours" | "practice_hours" | "self_study_hours" | "prerequisites" | "content"
   >;
   onApply: (updates: Partial<SyllabusFormData>) => void;
   onClose: () => void;
@@ -93,7 +93,10 @@ export function SyllabusFormAI({ formData, onApply, onClose }: Props) {
       else if (key === "passing_grade") updates.passing_grade = String(choice.value);
       else if (key === "textbooks") updates.textbooks = choice.value as TextbookEntry[];
       else if (key === "online_resources") updates.online_resources = choice.value as OnlineResourceEntry[];
-      else if (key === "content") updates.content = choice.value as Record<string, unknown>;
+      else if (key === "content") {
+        // Merge with existing content to preserve self_study and other manually-entered data
+        updates.content = { ...formData.content, ...(choice.value as Record<string, unknown>) };
+      }
     }
 
     onApply(updates);

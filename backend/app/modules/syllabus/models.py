@@ -54,6 +54,13 @@ class Syllabus(Base):
     learning_outcomes: Mapped[list | None] = mapped_column(JSON, nullable=True)
     competencies: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
+    # TIU meta (migration 004)
+    instructor_phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    office_hours: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    reviewer_1: Mapped[dict | None] = mapped_column(JSON, nullable=True)   # {name, title, org}
+    reviewer_2: Mapped[dict | None] = mapped_column(JSON, nullable=True)   # {name, title, org}
+    approval_info: Mapped[dict | None] = mapped_column(JSON, nullable=True) # {approver_name, date, council_date, council_number}
+
     status: Mapped[SyllabusStatus] = mapped_column(
         Enum(SyllabusStatus, values_callable=lambda obj: [e.value for e in obj]),
         default=SyllabusStatus.DRAFT,

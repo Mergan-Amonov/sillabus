@@ -6,12 +6,12 @@ interface Props {
   onChange: (updates: Partial<SyllabusFormData>) => void;
 }
 
-const INPUT = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
+const INPUT = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500";
 
 type GPKey = keyof SyllabusFormData["grading_policy"];
 
 const GRADING_FIELDS: { key: GPKey; label: string; color: string }[] = [
-  { key: "current_control", label: "Joriy nazorat", color: "bg-blue-500" },
+  { key: "current_control", label: "Joriy nazorat", color: "bg-primary-500" },
   { key: "midterm", label: "Oraliq imtihon", color: "bg-purple-500" },
   { key: "final", label: "Yakuniy imtihon", color: "bg-indigo-600" },
 ];
@@ -39,7 +39,7 @@ export function SyllabusFormGrading({ data, onChange }: Props) {
                   max={100}
                   value={gp[key]}
                   onChange={(e) => setGP(key, Number(e.target.value))}
-                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm text-center font-mono focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
                 <span className="text-sm text-gray-500">%</span>
               </div>
@@ -85,7 +85,7 @@ export function SyllabusFormGrading({ data, onChange }: Props) {
             max={100}
             value={data.passing_grade}
             onChange={(e) => onChange({ passing_grade: e.target.value })}
-            className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm text-center font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm text-center font-mono focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <span className="text-sm text-gray-500">ball va undan yuqori — o'tgan hisoblanadi</span>
         </div>

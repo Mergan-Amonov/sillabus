@@ -12,6 +12,8 @@ import { SyllabusFormGrading } from "@/components/syllabus/SyllabusFormGrading";
 import { SyllabusFormOutcomes } from "@/components/syllabus/SyllabusFormOutcomes";
 import { SyllabusFormResources } from "@/components/syllabus/SyllabusFormResources";
 import { SyllabusFormAI } from "@/components/syllabus/SyllabusFormAI";
+import { SyllabusFormWeekly } from "@/components/syllabus/SyllabusFormWeekly";
+import { SyllabusFormMeta } from "@/components/syllabus/SyllabusFormMeta";
 import { DEFAULT_FORM, formToPayload, LANGUAGE_LABELS, STEPS } from "@/components/syllabus/types";
 import type { SyllabusFormData } from "@/components/syllabus/types";
 
@@ -90,7 +92,7 @@ export default function NewSyllabusPage() {
   if (!hydrated) {
     return (
       <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
       </div>
     );
   }
@@ -124,7 +126,9 @@ export default function NewSyllabusPage() {
         {step === 3 && <SyllabusFormGrading data={form} onChange={update} />}
         {step === 4 && <SyllabusFormOutcomes data={form} onChange={update} />}
         {step === 5 && <SyllabusFormResources data={form} onChange={update} />}
-        {step === 6 && <ReviewStep form={form} />}
+        {step === 6 && <SyllabusFormWeekly data={form} onChange={update} onAI={() => setShowAI(true)} />}
+        {step === 7 && <SyllabusFormMeta data={form} onChange={update} />}
+        {step === 8 && <ReviewStep form={form} />}
       </div>
 
       {error && (
@@ -148,11 +152,11 @@ export default function NewSyllabusPage() {
 
         <div className="flex-1" />
 
-        {step < 6 ? (
+        {step < 8 ? (
           <button
             onClick={() => canNext() && setStep((s) => s + 1)}
             disabled={!canNext()}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >
             Keyingi <ChevronRight size={15} />
           </button>
@@ -169,7 +173,7 @@ export default function NewSyllabusPage() {
             <button
               onClick={() => handleSave(true)}
               disabled={saving}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
             >
               {saving ? <Loader2 size={14} className="animate-spin" /> : null}
               Saqlash va yuborish

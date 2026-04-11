@@ -34,7 +34,7 @@ function ListEditor({ items, placeholder, addLabel, onChange }: ListEditorProps)
             value={item}
             onChange={(e) => update(i, e.target.value)}
             placeholder={placeholder}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <button
             type="button"
@@ -48,7 +48,7 @@ function ListEditor({ items, placeholder, addLabel, onChange }: ListEditorProps)
       <button
         type="button"
         onClick={add}
-        className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors mt-1"
+        className="inline-flex items-center gap-1.5 text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors mt-1"
       >
         <Plus size={13} /> {addLabel}
       </button>

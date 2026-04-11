@@ -7,7 +7,7 @@ interface Props {
   onChange: (updates: Partial<SyllabusFormData>) => void;
 }
 
-const INPUT = "px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
+const INPUT = "px-2.5 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500";
 
 export function SyllabusFormResources({ data, onChange }: Props) {
   // ── Textbooks ────────────────────────────────────────────────────────────
@@ -53,7 +53,7 @@ export function SyllabusFormResources({ data, onChange }: Props) {
           <button
             type="button"
             onClick={addBook}
-            className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium"
+            className="inline-flex items-center gap-1.5 text-xs text-primary-600 hover:text-primary-700 font-medium"
           >
             <Plus size={13} /> Kitob qo&apos;shish
           </button>
@@ -109,7 +109,7 @@ export function SyllabusFormResources({ data, onChange }: Props) {
                     type="checkbox"
                     checked={book.required}
                     onChange={(e) => updateBook(i, { required: e.target.checked })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   />
                   Asosiy adabiyot (required)
                 </label>
@@ -129,7 +129,7 @@ export function SyllabusFormResources({ data, onChange }: Props) {
           <button
             type="button"
             onClick={addResource}
-            className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 font-medium"
+            className="inline-flex items-center gap-1.5 text-xs text-primary-600 hover:text-primary-700 font-medium"
           >
             <Plus size={13} /> Resurs qo&apos;shish
           </button>

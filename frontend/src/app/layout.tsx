@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Silabuys — Aqlli Syllabus Platformasi",
+  title: "Silabus.uz — Aqlli Syllabus Platformasi",
   description: "Universitet syllabus boshqaruv tizimi",
 };
 

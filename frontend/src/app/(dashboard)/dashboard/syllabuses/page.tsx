@@ -54,7 +54,7 @@ export default function SyllabusesPage() {
         </div>
         <Link
           href="/dashboard/syllabuses/new"
-          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
           <Plus size={16} />
           Yangi syllabus
@@ -69,13 +69,13 @@ export default function SyllabusesPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Qidirish..."
-              className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
           <select
             value={status}
             onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
           >
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -87,7 +87,7 @@ export default function SyllabusesPage() {
 
         {loading ? (
           <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
@@ -121,7 +121,7 @@ export default function SyllabusesPage() {
                   <td className="px-6 py-4">
                     <Link
                       href={`/dashboard/syllabuses/${s.id}`}
-                      className="text-sm font-medium text-blue-600 hover:underline"
+                      className="text-sm font-medium text-primary-600 hover:underline"
                     >
                       {s.title}
                     </Link>

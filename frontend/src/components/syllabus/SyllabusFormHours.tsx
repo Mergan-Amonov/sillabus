@@ -5,7 +5,7 @@ interface Props {
   onChange: (updates: Partial<SyllabusFormData>) => void;
 }
 
-const INPUT = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-center font-mono";
+const INPUT = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 text-center font-mono";
 const LABEL = "block text-sm font-medium text-gray-700 mb-1 text-center";
 
 type HoursKey = "lecture_hours" | "practice_hours" | "lab_hours" | "self_study_hours";
@@ -91,7 +91,7 @@ export function SyllabusFormHours({ data, onChange }: Props) {
                   <span className="text-xs text-gray-500 w-24 shrink-0">{label}</span>
                   <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-500 rounded-full transition-all"
+                      className="h-full bg-primary-500 rounded-full transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

@@ -5,6 +5,19 @@ from typing import Any
 from app.modules.syllabus.models import SyllabusStatus
 
 
+class ReviewerInfo(BaseModel):
+    name: str = ""
+    title: str = ""
+    org: str = ""
+
+
+class ApprovalInfo(BaseModel):
+    approver_name: str = ""
+    date: str = ""           # "2025-09-25"
+    council_date: str = ""
+    council_number: str = ""
+
+
 class SyllabusCreateRequest(BaseModel):
     title: str
     course_code: str
@@ -40,6 +53,13 @@ class SyllabusCreateRequest(BaseModel):
     # Kompetensiyalar
     learning_outcomes: list[str] | None = None
     competencies: list[str] | None = None
+
+    # TIU meta (migration 004)
+    instructor_phone: str | None = None
+    office_hours: str | None = None
+    reviewer_1: ReviewerInfo | None = None
+    reviewer_2: ReviewerInfo | None = None
+    approval_info: ApprovalInfo | None = None
 
     @field_validator("credit_hours")
     @classmethod
@@ -91,6 +111,13 @@ class SyllabusUpdateRequest(BaseModel):
     # Kompetensiyalar
     learning_outcomes: list[str] | None = None
     competencies: list[str] | None = None
+
+    # TIU meta (migration 004)
+    instructor_phone: str | None = None
+    office_hours: str | None = None
+    reviewer_1: ReviewerInfo | None = None
+    reviewer_2: ReviewerInfo | None = None
+    approval_info: ApprovalInfo | None = None
 
     @field_validator("credit_hours")
     @classmethod
@@ -158,6 +185,13 @@ class SyllabusResponse(BaseModel):
     # Kompetensiyalar
     learning_outcomes: list[str] | None = None
     competencies: list[str] | None = None
+
+    # TIU meta (migration 004)
+    instructor_phone: str | None = None
+    office_hours: str | None = None
+    reviewer_1: ReviewerInfo | None = None
+    reviewer_2: ReviewerInfo | None = None
+    approval_info: ApprovalInfo | None = None
 
 
 class SyllabusListResponse(BaseModel):

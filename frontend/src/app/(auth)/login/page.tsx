@@ -41,7 +41,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Silabuys</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Silabus<span className="text-accent-600">.uz</span></h1>
             <p className="text-gray-500 mt-1 text-sm">Hisobingizga kiring</p>
           </div>
 
@@ -54,7 +54,7 @@ export default function LoginPage() {
                 {...register("email")}
                 type="email"
                 placeholder="example@university.uz"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
@@ -69,7 +69,7 @@ export default function LoginPage() {
                 {...register("password")}
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
@@ -85,7 +85,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-primary-600 text-white py-2 rounded-lg font-medium text-sm hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? "Kirish..." : "Kirish"}
             </button>
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Hisobingiz yo&apos;qmi?{" "}
-            <Link href="/register" className="text-blue-600 hover:underline font-medium">
+            <Link href="/register" className="text-primary-600 hover:underline font-medium">
               Ro&apos;yxatdan o&apos;ting
             </Link>
           </p>

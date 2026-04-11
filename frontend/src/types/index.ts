@@ -95,6 +95,12 @@ export interface Syllabus {
   online_resources: OnlineResourceEntry[] | null;
   learning_outcomes: string[] | null;
   competencies: string[] | null;
+  // TIU meta (migration 004)
+  instructor_phone: string | null;
+  office_hours: string | null;
+  reviewer_1: { name: string; title: string; org: string } | null;
+  reviewer_2: { name: string; title: string; org: string } | null;
+  approval_info: { approver_name: string; date: string; council_date: string; council_number: string } | null;
 }
 
 export interface SyllabusListResponse {

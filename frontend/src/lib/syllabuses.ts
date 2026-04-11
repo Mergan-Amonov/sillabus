@@ -26,6 +26,11 @@ export type SyllabusPayload = Partial<{
   online_resources: OnlineResourceEntry[];
   learning_outcomes: string[];
   competencies: string[];
+  instructor_phone: string;
+  office_hours: string;
+  reviewer_1: { name: string; title: string; org: string };
+  reviewer_2: { name: string; title: string; org: string };
+  approval_info: { approver_name: string; date: string; council_date: string; council_number: string };
 }>;
 
 export async function listSyllabuses(

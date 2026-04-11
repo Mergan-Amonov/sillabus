@@ -18,9 +18,9 @@ export function StepIndicator({ current }: Props) {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                   done
-                    ? "bg-blue-600 text-white"
+                    ? "bg-primary-600 text-white"
                     : active
-                    ? "bg-blue-600 text-white ring-4 ring-blue-100"
+                    ? "bg-primary-600 text-white ring-4 ring-primary-100"
                     : "bg-gray-100 text-gray-400"
                 }`}
               >
@@ -28,7 +28,7 @@ export function StepIndicator({ current }: Props) {
               </div>
               <span
                 className={`text-[11px] mt-1 font-medium whitespace-nowrap ${
-                  active ? "text-blue-600" : done ? "text-gray-500" : "text-gray-400"
+                  active ? "text-primary-600" : done ? "text-gray-500" : "text-gray-400"
                 }`}
               >
                 {step.label}
@@ -37,7 +37,7 @@ export function StepIndicator({ current }: Props) {
             {i < STEPS.length - 1 && (
               <div
                 className={`h-0.5 w-8 sm:w-12 mx-1 mb-4 transition-colors ${
-                  done ? "bg-blue-600" : "bg-gray-200"
+                  done ? "bg-primary-600" : "bg-gray-200"
                 }`}
               />
             )}

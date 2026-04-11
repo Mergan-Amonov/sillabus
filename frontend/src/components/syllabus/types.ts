@@ -1,6 +1,19 @@
 import type { Syllabus, GradingPolicy, TextbookEntry, OnlineResourceEntry, SyllabusLanguage } from "@/types";
 import type { SyllabusPayload } from "@/lib/syllabuses";
 
+export interface ReviewerInfo {
+  name: string;
+  title: string;
+  org: string;
+}
+
+export interface ApprovalInfo {
+  approver_name: string;
+  date: string;
+  council_date: string;
+  council_number: string;
+}
+
 export interface SyllabusFormData {
   // Step 1: Asosiy
   title: string;
@@ -29,11 +42,20 @@ export interface SyllabusFormData {
   // Step 5: Adabiyotlar
   textbooks: TextbookEntry[];
   online_resources: OnlineResourceEntry[];
-  // AI-generated weekly content (transparent)
+  // Step 6: Haftalik jadval (content.weeks + content.self_study)
   content: Record<string, unknown>;
+  // Step 7: Meta (TIU)
+  instructor_phone: string;
+  office_hours: string;
+  reviewer_1: ReviewerInfo;
+  reviewer_2: ReviewerInfo;
+  approval_info: ApprovalInfo;
 }
 
 const yr = new Date().getFullYear();
+
+const EMPTY_REVIEWER: ReviewerInfo = { name: "", title: "", org: "" };
+const EMPTY_APPROVAL: ApprovalInfo = { approver_name: "", date: "", council_date: "", council_number: "" };
 
 export const DEFAULT_FORM: SyllabusFormData = {
   title: "",
@@ -59,6 +81,11 @@ export const DEFAULT_FORM: SyllabusFormData = {
   textbooks: [],
   online_resources: [],
   content: {},
+  instructor_phone: "",
+  office_hours: "",
+  reviewer_1: { ...EMPTY_REVIEWER },
+  reviewer_2: { ...EMPTY_REVIEWER },
+  approval_info: { ...EMPTY_APPROVAL },
 };
 
 export const LANGUAGE_LABELS: Record<SyllabusLanguage, string> = {
@@ -73,7 +100,9 @@ export const STEPS = [
   { label: "Baholash", short: "3" },
   { label: "Natijalar", short: "4" },
   { label: "Adabiyotlar", short: "5" },
-  { label: "Yakuniy", short: "6" },
+  { label: "Haftalik jadval", short: "6" },
+  { label: "Qo'shimcha", short: "7" },
+  { label: "Yakuniy", short: "8" },
 ] as const;
 
 // Normalize a language string from backend to SyllabusLanguage
@@ -110,6 +139,11 @@ export function syllabusToForm(s: Syllabus): SyllabusFormData {
     textbooks: s.textbooks ?? [],
     online_resources: s.online_resources ?? [],
     content: (s.content as Record<string, unknown>) ?? {},
+    instructor_phone: s.instructor_phone ?? "",
+    office_hours: s.office_hours ?? "",
+    reviewer_1: (s.reviewer_1 as ReviewerInfo | null) ?? { ...EMPTY_REVIEWER },
+    reviewer_2: (s.reviewer_2 as ReviewerInfo | null) ?? { ...EMPTY_REVIEWER },
+    approval_info: (s.approval_info as ApprovalInfo | null) ?? { ...EMPTY_APPROVAL },
   };
 }
 
@@ -143,6 +177,15 @@ export function formToPayload(form: SyllabusFormData): SyllabusPayload {
   if (form.competencies.length > 0) payload.competencies = form.competencies.filter(Boolean);
   if (form.textbooks.length > 0) payload.textbooks = form.textbooks;
   if (form.online_resources.length > 0) payload.online_resources = form.online_resources;
+  if (form.instructor_phone) payload.instructor_phone = form.instructor_phone;
+  if (form.office_hours) payload.office_hours = form.office_hours;
+  const r1 = form.reviewer_1;
+  if (r1.name || r1.title || r1.org) payload.reviewer_1 = r1;
+  const r2 = form.reviewer_2;
+  if (r2.name || r2.title || r2.org) payload.reviewer_2 = r2;
+  const ap = form.approval_info;
+  if (ap.approver_name || ap.date || ap.council_date || ap.council_number)
+    payload.approval_info = ap;
 
   return payload;
 }

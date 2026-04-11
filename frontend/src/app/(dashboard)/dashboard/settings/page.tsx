@@ -57,7 +57,7 @@ const PROVIDERS = [
     keyUrl: "https://openrouter.ai/keys",
     local: false,
     badge: "Bepul bor",
-    badgeColor: "bg-blue-100 text-blue-700",
+    badgeColor: "bg-primary-100 text-primary-700",
     description: "100+ model. :free modellari bepul.",
     models: [
       "meta-llama/llama-3.3-70b-instruct:free",
@@ -207,8 +207,8 @@ export default function SettingsPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Profil</h2>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-            <span className="text-xl font-bold text-blue-600">
+          <div className="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+            <span className="text-xl font-bold text-primary-600">
               {user?.full_name?.[0]?.toUpperCase() ?? "?"}
             </span>
           </div>
@@ -257,7 +257,7 @@ export default function SettingsPage() {
               onClick={() => handleSelect(p.id)}
               className={`relative flex flex-col items-start gap-1 p-3 rounded-xl border-2 text-left transition-all ${
                 selectedId === p.id
-                  ? "border-blue-500 bg-blue-50"
+                  ? "border-primary-500 bg-primary-50"
                   : "border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50"
               }`}
             >
@@ -269,12 +269,12 @@ export default function SettingsPage() {
                   </span>
                 )}
               </div>
-              <span className={`text-sm font-semibold ${selectedId === p.id ? "text-blue-700" : "text-gray-800"}`}>
+              <span className={`text-sm font-semibold ${selectedId === p.id ? "text-primary-700" : "text-gray-800"}`}>
                 {p.label}
               </span>
               <span className="text-[11px] text-gray-400">{p.sublabel}</span>
               {selectedId === p.id && (
-                <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-500" />
+                <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary-500" />
               )}
             </button>
           ))}
@@ -294,7 +294,7 @@ export default function SettingsPage() {
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder={provider.placeholder}
-                className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono bg-gray-50"
+                className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono bg-gray-50"
               />
               <button
                 type="button"
@@ -307,7 +307,7 @@ export default function SettingsPage() {
             {provider.keyUrl && (
               <p className="text-xs text-gray-400 mt-1">
                 Kalit olish:{" "}
-                <a href={provider.keyUrl} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">
+                <a href={provider.keyUrl} target="_blank" rel="noreferrer" className="text-primary-500 hover:underline">
                   {provider.keyHint}
                 </a>
               </p>
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                   onClick={() => handleModelSelect(m)}
                   className={`px-2.5 py-1 rounded-md text-xs font-mono border transition-colors ${
                     model === m
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-primary-600 text-white border-primary-600"
                       : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
                   }`}
                 >
@@ -339,7 +339,7 @@ export default function SettingsPage() {
               value={model}
               onChange={(e) => setModel(e.target.value)}
               placeholder="yoki o'zingiz yozing..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono bg-gray-50"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono bg-gray-50"
             />
           </div>
         )}
@@ -360,7 +360,7 @@ export default function SettingsPage() {
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
                 placeholder={provider.base_url || "https://..."}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono bg-gray-50"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono bg-gray-50"
               />
               <p className="text-xs text-gray-400 mt-1">
                 Bo&apos;sh qoldirilsa provayder default URL ishlatiladi
@@ -387,7 +387,7 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={loading || !canSave}
-            className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 bg-primary-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? "Saqlanmoqda..." : "Saqlash"}
           </button>
